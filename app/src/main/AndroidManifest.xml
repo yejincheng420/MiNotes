@@ -1,24 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+<!--
+    根节点，声明包的命名空间。
+    versionCode: 内部版本号（用于升级比较）
+    versionName: 显示给用户的版本号
+-->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     android:versionCode="1"
     android:versionName="0.1" >
 
+    <!-- 声明应用支持的最低 Android 版本，14 代表 Android 4.0 (Ice Cream Sandwich) -->
     <uses-sdk android:minSdkVersion="14" />
 
+    <!-- ==================== 权限声明区域 ==================== -->
+
+    <!-- 允许程序写入外部存储（SD卡），用于导出便签数据或保存图片 -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!-- 允许程序在桌面上创建快捷方式（例如将某条便签发送到桌面） -->
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
+    <!-- 允许程序访问网络，主要用于将便签与 Google Tasks (GTask) 同步 -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- 允许读取联系人，用于"通话便签"功能（将便签与特定联系人绑定） -->
     <uses-permission android:name="android.permission.READ_CONTACTS" />
+
+    <!-- 以下四个权限用于账号管理，主要用于获取和验证 Google 账号，以便进行 GTask 云同步 -->
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+
+    <!-- 允许接收设备开机完成的广播，用于在开机时重新注册便签的定时提醒（闹钟） -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
+    <!-- ==================== 应用组件配置区域 ==================== -->
+    <!--
+        android:icon: 应用在桌面显示的图标
+        android:label: 应用的名称（小米便签）
+    -->
     <application
         android:icon="@drawable/icon_app"
         android:label="@string/app_name" >
+
+        <!-- 1. 便签列表主界面 -->
         <activity
             android:name=".ui.NotesListActivity"
             android:exported="true"
@@ -28,13 +51,19 @@
             android:theme="@style/NoteTheme"
             android:uiOptions="splitActionBarWhenNarrow"
             android:windowSoftInputMode="adjustPan" >
+            <!-- configChanges: 屏幕旋转或键盘弹出时，不重新创建Activity，而是回调onConfigurationChanged -->
+            <!-- launchMode="singleTop": 如果该界面已经在栈顶，再次启动时不会创建新实例 -->
+            <!-- uiOptions: 窄屏时拆分 ActionBar（底部显示菜单） -->
+            <!-- windowSoftInputMode="adjustPan": 软键盘弹出时，界面整体上移，避免遮挡输入框 -->
 
+            <!-- 设置为程序的入口点，在桌面上显示图标 -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
+        <!-- 2. 便签编辑界面 -->
         <activity
             android:name=".ui.NoteEditActivity"
             android:exported="true"
@@ -42,6 +71,7 @@
             android:launchMode="singleTop"
             android:theme="@style/NoteTheme" >
 
+            <!-- 允许其他应用或组件通过隐式 Intent 查看(VIEW)特定类型的数据（文本便签、通话便签） -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -49,6 +79,7 @@
                 <data android:mimeType="vnd.android.cursor.item/call_note" />
             </intent-filter>
 
+            <!-- 允许其他应用或组件插入或编辑(INSERT_OR_EDIT)特定类型的数据 -->
             <intent-filter>
                 <action android:name="android.intent.action.INSERT_OR_EDIT" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -56,51 +87,62 @@
                 <data android:mimeType="vnd.android.cursor.item/call_note" />
             </intent-filter>
 
+            <!-- 配置系统搜索功能，使该 Activity 能够处理搜索请求 -->
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
 
+            <!-- 指定搜索配置的 XML 文件 -->
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
 
+        <!-- 3. 内容提供者 (ContentProvider) -->
+        <!-- 用于管理底层的 SQLite 数据库，并（可能）向外提供数据访问接口 -->
         <provider
             android:name="net.micode.notes.data.NotesProvider"
             android:authorities="micode_notes"
             android:multiprocess="true" />
+        <!-- multiprocess="true": 允许在调用者的进程中实例化此 provider，减少跨进程通信开销 -->
 
+        <!-- 4. 桌面小部件 (2x2 尺寸) -->
         <receiver
             android:name=".widget.NoteWidgetProvider_2x"
             android:exported="true"
             android:label="@string/app_widget2x2" >
             <intent-filter>
+                <!-- 监听小部件的更新和删除广播 -->
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="android.appwidget.action.APPWIDGET_DELETED" />
+                <!-- 自定义广播：监听隐私模式的改变（用于隐藏或显示隐私便签内容） -->
                 <action android:name="android.intent.action.PRIVACY_MODE_CHANGED" />
             </intent-filter>
-
+            <!-- 绑定 2x2 小部件的具体配置文件 -->
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_2x_info" />
         </receiver>
+
+        <!-- 5. 桌面小部件 (4x4 尺寸) -->
         <receiver
             android:name=".widget.NoteWidgetProvider_4x"
             android:exported="true"
             android:label="@string/app_widget4x4" >
-
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="android.appwidget.action.APPWIDGET_DELETED" />
                 <action android:name="android.intent.action.PRIVACY_MODE_CHANGED" />
             </intent-filter>
-
+            <!-- 绑定 4x4 小部件的具体配置文件 -->
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_4x_info" />
         </receiver>
 
+        <!-- 6. 开机广播接收器 -->
+        <!-- 手机重启后，系统中的定时任务(AlarmManager)会被清空。此组件负责在开机后重新设置便签的提醒闹钟 -->
         <receiver
             android:name=".ui.AlarmInitReceiver"
             android:exported="true" >
@@ -109,18 +151,26 @@
             </intent-filter>
         </receiver>
 
+        <!-- 7. 闹钟提醒接收器 -->
+        <!-- 当便签设定的时间到达时，接收 AlarmManager 发出的广播 -->
         <receiver
             android:name="net.micode.notes.ui.AlarmReceiver"
             android:process=":remote" >
+            <!-- android:process=":remote": 让该接收器在一个独立的名为 remote 的进程中运行，避免主进程被杀时闹钟失效 -->
         </receiver>
 
+        <!-- 8. 闹钟提醒弹窗界面 -->
         <activity
             android:name=".ui.AlarmAlertActivity"
             android:label="@string/app_name"
             android:launchMode="singleInstance"
             android:theme="@android:style/Theme.Holo.Wallpaper.NoTitleBar" >
+            <!-- singleInstance: 独占一个任务栈，确保提醒弹窗在任何情况下都能独立且置顶显示 -->
+            <!-- theme: 使用系统壁纸作为背景，无标题栏，呈现出弹窗/悬浮的视觉效果 -->
         </activity>
 
+        <!-- 9. 设置(偏好)界面 -->
+        <!-- 用于配置便签的字体大小、账号同步等设置项 -->
         <activity
             android:name="net.micode.notes.ui.NotesPreferenceActivity"
             android:label="@string/preferences_title"
@@ -128,11 +178,16 @@
             android:theme="@android:style/Theme.Holo.Light" >
         </activity>
 
+        <!-- 10. GTask后台同步服务 -->
+        <!-- 负责在后台将本地便签数据与 Google Tasks 上的数据进行同步 -->
         <service
             android:name="net.micode.notes.gtask.remote.GTaskSyncService"
             android:exported="false" >
+            <!-- exported="false": 此服务仅供本应用内部使用，不允许其他应用调用，保证数据安全 -->
         </service>
 
+        <!-- 11. 全局默认搜索配置 -->
+        <!-- 声明应用内执行搜索时，默认由 NoteEditActivity 来处理搜索 Intent -->
         <meta-data
             android:name="android.app.default_searchable"
             android:value=".ui.NoteEditActivity" />
