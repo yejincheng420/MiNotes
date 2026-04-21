@@ -120,6 +120,15 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
 
     private NoteItemData mFocusNoteDataItem; // 当前长按选中的便签数据
 
+    // 颜色筛选相关
+    private int mColorFilter = -1; // -1: 全部, 0-4: 对应5种颜色
+    private Button mBtnFilterAll;
+    private Button mBtnFilterYellow;
+    private Button mBtnFilterBlue;
+    private Button mBtnFilterWhite;
+    private Button mBtnFilterGreen;
+    private Button mBtnFilterRed;
+
     // SQL查询条件：普通文件夹内的便签
     private static final String NORMAL_SELECTION = NoteColumns.PARENT_ID + "=?";
     // SQL查询条件：根目录下的便签（排除系统隐藏便签，包含有内容的通话记录文件夹）
@@ -239,6 +248,45 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
         mTitleBar = (TextView) findViewById(R.id.tv_title_bar);
         mState = ListEditState.NOTE_LIST; // 初始化状态为主列表
         mModeCallBack = new ModeCallback();
+
+        initColorFilterButtons();
+    }
+
+    private void initColorFilterButtons() {
+        mBtnFilterAll = (Button) findViewById(R.id.btn_filter_all);
+        mBtnFilterYellow = (Button) findViewById(R.id.btn_filter_yellow);
+        mBtnFilterBlue = (Button) findViewById(R.id.btn_filter_blue);
+        mBtnFilterWhite = (Button) findViewById(R.id.btn_filter_white);
+        mBtnFilterGreen = (Button) findViewById(R.id.btn_filter_green);
+        mBtnFilterRed = (Button) findViewById(R.id.btn_filter_red);
+
+        mBtnFilterAll.setOnClickListener(this);
+        mBtnFilterYellow.setOnClickListener(this);
+        mBtnFilterBlue.setOnClickListener(this);
+        mBtnFilterWhite.setOnClickListener(this);
+        mBtnFilterGreen.setOnClickListener(this);
+        mBtnFilterRed.setOnClickListener(this);
+
+        updateFilterButtonState();
+    }
+
+    private void updateFilterButtonState() {
+        if (mBtnFilterAll == null || mBtnFilterYellow == null) {
+            return;
+        }
+        mBtnFilterAll.setSelected(mColorFilter == -1);
+        mBtnFilterYellow.setSelected(mColorFilter == 0);
+        mBtnFilterBlue.setSelected(mColorFilter == 1);
+        mBtnFilterWhite.setSelected(mColorFilter == 2);
+        mBtnFilterGreen.setSelected(mColorFilter == 3);
+        mBtnFilterRed.setSelected(mColorFilter == 4);
+
+        mBtnFilterAll.setTextColor(mColorFilter == -1 ? 0xFFFFFFFF : 0xFF666666);
+        mBtnFilterYellow.setAlpha(mColorFilter == 0 ? 1.0f : 0.5f);
+        mBtnFilterBlue.setAlpha(mColorFilter == 1 ? 1.0f : 0.5f);
+        mBtnFilterWhite.setAlpha(mColorFilter == 2 ? 1.0f : 0.5f);
+        mBtnFilterGreen.setAlpha(mColorFilter == 3 ? 1.0f : 0.5f);
+        mBtnFilterRed.setAlpha(mColorFilter == 4 ? 1.0f : 0.5f);
     }
 
     /**
@@ -417,10 +465,21 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
     private void startAsyncNotesListQuery() {
         String selection = (mCurrentFolderId == Notes.ID_ROOT_FOLDER) ? ROOT_FOLDER_SELECTION
                 : NORMAL_SELECTION;
+        String[] selectionArgs = new String[] { String.valueOf(mCurrentFolderId) };
+
+        if (mColorFilter >= 0) {
+            String colorSelection = NoteColumns.BG_COLOR_ID + "=?";
+            if (mCurrentFolderId == Notes.ID_ROOT_FOLDER) {
+                selection = "(" + ROOT_FOLDER_SELECTION + ") AND " + colorSelection;
+            } else {
+                selection = "(" + NORMAL_SELECTION + ") AND " + colorSelection;
+            }
+            selectionArgs = new String[] { String.valueOf(mCurrentFolderId), String.valueOf(mColorFilter) };
+        }
+
         mBackgroundQueryHandler.startQuery(FOLDER_NOTE_LIST_QUERY_TOKEN, null,
-                Notes.CONTENT_NOTE_URI, NoteItemData.PROJECTION, selection, new String[] {
-                        String.valueOf(mCurrentFolderId)
-                }, NoteColumns.TYPE + " DESC," + NoteColumns.MODIFIED_DATE + " DESC");
+                Notes.CONTENT_NOTE_URI, NoteItemData.PROJECTION, selection, selectionArgs,
+                NoteColumns.TYPE + " DESC," + NoteColumns.MODIFIED_DATE + " DESC");
     }
 
     /**
@@ -591,6 +650,30 @@ public class NotesListActivity extends Activity implements OnClickListener, OnIt
     public void onClick(View v) {
         if (v.getId() == R.id.btn_new_note) {
             createNewNote();
+        } else if (v.getId() == R.id.btn_filter_all) {
+            mColorFilter = -1;
+            startAsyncNotesListQuery();
+            updateFilterButtonState();
+        } else if (v.getId() == R.id.btn_filter_yellow) {
+            mColorFilter = 0; // ResourceParser.YELLOW
+            startAsyncNotesListQuery();
+            updateFilterButtonState();
+        } else if (v.getId() == R.id.btn_filter_blue) {
+            mColorFilter = 1; // ResourceParser.BLUE
+            startAsyncNotesListQuery();
+            updateFilterButtonState();
+        } else if (v.getId() == R.id.btn_filter_white) {
+            mColorFilter = 2; // ResourceParser.WHITE
+            startAsyncNotesListQuery();
+            updateFilterButtonState();
+        } else if (v.getId() == R.id.btn_filter_green) {
+            mColorFilter = 3; // ResourceParser.GREEN
+            startAsyncNotesListQuery();
+            updateFilterButtonState();
+        } else if (v.getId() == R.id.btn_filter_red) {
+            mColorFilter = 4; // ResourceParser.RED
+            startAsyncNotesListQuery();
+            updateFilterButtonState();
         }
     }
 

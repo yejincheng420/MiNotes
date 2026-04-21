@@ -24,4 +24,14 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="filter_yellow">#FFFFD700</color>
+    <color name="filter_blue">#FF4169E1</color>
+    <color name="filter_white">#FFFFFFFF</color>
+    <color name="filter_green">#FF32CD32</color>
+    <color name="filter_red">#FFDC143C</color>
+    <color name="filter_selected">#FF333333</color>
+    <color name="filter_text_color">#FF666666</color>
+    <color name="filter_text_normal">#FF666666</color>
+    <color name="filter_text_selected">#FFFFFFFF</color>
 </resources>
