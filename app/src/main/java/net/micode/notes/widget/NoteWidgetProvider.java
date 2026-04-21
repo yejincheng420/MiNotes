@@ -32,11 +32,17 @@ import net.micode.notes.tool.ResourceParser;
 import net.micode.notes.ui.NoteEditActivity;
 import net.micode.notes.ui.NotesListActivity;
 
+/**
+ * 便签桌面小部件提供者基类
+ * 继承自AppWidgetProvider，处理桌面小部件的创建、更新、删除等生命周期
+ * 负责将便签内容显示在桌面小部件上，并处理点击事件
+ */
 public abstract class NoteWidgetProvider extends AppWidgetProvider {
+    // 数据库查询投影，指定需要查询的列
     public static final String [] PROJECTION = new String [] {
-        NoteColumns.ID,
-        NoteColumns.BG_COLOR_ID,
-        NoteColumns.SNIPPET
+        NoteColumns.ID,         // 便签ID
+        NoteColumns.BG_COLOR_ID, // 背景颜色ID
+        NoteColumns.SNIPPET    // 便签摘要内容
     };
 
     public static final int COLUMN_ID           = 0;

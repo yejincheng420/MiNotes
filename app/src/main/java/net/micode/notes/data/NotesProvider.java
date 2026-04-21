@@ -35,21 +35,28 @@ import net.micode.notes.data.Notes.NoteColumns;
 import net.micode.notes.data.NotesDatabaseHelper.TABLE;
 
 
+/**
+ * 便签内容提供者（ContentProvider）
+ * 负责管理便签数据的CRUD操作，是应用与SQLite数据库之间的桥梁
+ * 通过Content URI对外提供数据访问接口
+ */
 public class NotesProvider extends ContentProvider {
+    // URI匹配器，用于解析Content URI
     private static final UriMatcher mMatcher;
 
-    private NotesDatabaseHelper mHelper;
+    private NotesDatabaseHelper mHelper; // 数据库辅助类
 
     private static final String TAG = "NotesProvider";
 
-    private static final int URI_NOTE            = 1;
-    private static final int URI_NOTE_ITEM       = 2;
-    private static final int URI_DATA            = 3;
-    private static final int URI_DATA_ITEM       = 4;
+    // URI匹配码常量
+    private static final int URI_NOTE            = 1;    // 查询所有便签
+    private static final int URI_NOTE_ITEM       = 2;    // 查询单条便签
+    private static final int URI_DATA            = 3;    // 查询便签数据
+    private static final int URI_DATA_ITEM       = 4;    // 查询单条数据
+    private static final int URI_SEARCH          = 5;    // 搜索便签
+    private static final int URI_SEARCH_SUGGEST  = 6;    // 搜索建议
 
-    private static final int URI_SEARCH          = 5;
-    private static final int URI_SEARCH_SUGGEST  = 6;
-
+    // 静态初始化块，注册URI匹配规则
     static {
         mMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         mMatcher.addURI(Notes.AUTHORITY, "note", URI_NOTE);

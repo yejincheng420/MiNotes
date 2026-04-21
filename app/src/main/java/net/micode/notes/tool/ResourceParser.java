@@ -22,21 +22,35 @@ import android.preference.PreferenceManager;
 import net.micode.notes.R;
 import net.micode.notes.ui.NotesPreferenceActivity;
 
+/**
+ * 资源解析器
+ * 负责管理便签的颜色和字体大小等视觉资源
+ * 将资源ID与具体的drawable资源进行映射
+ */
 public class ResourceParser {
 
-    public static final int YELLOW           = 0;
-    public static final int BLUE             = 1;
-    public static final int WHITE            = 2;
-    public static final int GREEN            = 3;
-    public static final int RED              = 4;
+    /**
+     * 便签背景颜色常量
+     * 对应5种预设的便签背景颜色
+     */
+    public static final int YELLOW           = 0;  // 黄色
+    public static final int BLUE             = 1;  // 蓝色
+    public static final int WHITE            = 2;  // 白色
+    public static final int GREEN            = 3;  // 绿色
+    public static final int RED              = 4;  // 红色
 
+    // 默认背景颜色
     public static final int BG_DEFAULT_COLOR = YELLOW;
 
-    public static final int TEXT_SMALL       = 0;
-    public static final int TEXT_MEDIUM      = 1;
-    public static final int TEXT_LARGE       = 2;
-    public static final int TEXT_SUPER       = 3;
+    /**
+     * 便签字体大小常量
+     */
+    public static final int TEXT_SMALL       = 0;   // 小号
+    public static final int TEXT_MEDIUM      = 1;   // 中号
+    public static final int TEXT_LARGE       = 2;   // 大号
+    public static final int TEXT_SUPER       = 3;   // 特大
 
+    // 默认字体大小
     public static final int BG_DEFAULT_FONT_SIZE = TEXT_MEDIUM;
 
     public static class NoteBgResources {

@@ -35,8 +35,20 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 
+/**
+ * 数据操作工具类
+ * 提供便签的批量删除、移动、查询等数据操作方法
+ * 所有对数据库的操作都通过这个类进行封装
+ */
 public class DataUtils {
-    public static final String TAG = "DataUtils";
+    private static final String TAG = "DataUtils";
+
+    /**
+     * 批量删除便签
+     * @param resolver ContentResolver，用于执行数据库操作
+     * @param ids 要删除的便签ID集合
+     * @return 删除是否成功
+     */
     public static boolean batchDeleteNotes(ContentResolver resolver, HashSet<Long> ids) {
         if (ids == null) {
             Log.d(TAG, "the ids is null");

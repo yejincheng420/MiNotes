@@ -17,24 +17,43 @@
 package net.micode.notes.data;
 
 import android.net.Uri;
+
+/**
+ * 便签数据常量定义类
+ * 定义了所有便签相关的URI、列名、类型常量，以及Intent传递参数的键名
+ * 是整个应用的数据中心，所有数据操作都依赖于这个类定义的常量
+ */
 public class Notes {
+    // 内容提供者授权标识，用于构建Content URI
     public static final String AUTHORITY = "micode_notes";
     public static final String TAG = "Notes";
-    public static final int TYPE_NOTE     = 0;
-    public static final int TYPE_FOLDER   = 1;
-    public static final int TYPE_SYSTEM   = 2;
+
+    // 便签类型常量
+    public static final int TYPE_NOTE     = 0;  // 普通便签
+    public static final int TYPE_FOLDER   = 1;  // 文件夹
+    public static final int TYPE_SYSTEM   = 2;  // 系统文件夹（隐藏）
 
     /**
-     * Following IDs are system folders' identifiers
-     * {@link Notes#ID_ROOT_FOLDER } is default folder
-     * {@link Notes#ID_TEMPARAY_FOLDER } is for notes belonging no folder
-     * {@link Notes#ID_CALL_RECORD_FOLDER} is to store call records
+     * 系统内置文件夹ID
+     * ID_ROOT_FOLDER: 根文件夹（默认便签存放位置）
+     * ID_TEMPARAY_FOLDER: 临时文件夹（不属于任何文件夹的便签）
+     * ID_CALL_RECORD_FOLDER: 通话记录文件夹（自动记录通话内容）
+     * ID_TRASH_FOLER: 垃圾箱（删除的便签临时存放）
      */
     public static final int ID_ROOT_FOLDER = 0;
     public static final int ID_TEMPARAY_FOLDER = -1;
     public static final int ID_CALL_RECORD_FOLDER = -2;
     public static final int ID_TRASH_FOLER = -3;
 
+    /**
+     * Intent传递参数的键名
+     * INTENT_EXTRA_ALERT_DATE: 提醒时间
+     * INTENT_EXTRA_BACKGROUND_ID: 便签背景颜色ID
+     * INTENT_EXTRA_WIDGET_ID: 桌面小部件ID
+     * INTENT_EXTRA_WIDGET_TYPE: 桌面小部件类型(2x或4x)
+     * INTENT_EXTRA_FOLDER_ID: 文件夹ID
+     * INTENT_EXTRA_CALL_DATE: 通话记录日期
+     */
     public static final String INTENT_EXTRA_ALERT_DATE = "net.micode.notes.alert_date";
     public static final String INTENT_EXTRA_BACKGROUND_ID = "net.micode.notes.background_color_id";
     public static final String INTENT_EXTRA_WIDGET_ID = "net.micode.notes.widget_id";
@@ -42,6 +61,12 @@ public class Notes {
     public static final String INTENT_EXTRA_FOLDER_ID = "net.micode.notes.folder_id";
     public static final String INTENT_EXTRA_CALL_DATE = "net.micode.notes.call_date";
 
+    /**
+     * 桌面小部件类型
+     * TYPE_WIDGET_INVALIDE: 无效的小部件
+     * TYPE_WIDGET_2X: 2x2 大小的小部件
+     * TYPE_WIDGET_4X: 4x4 大小的小部件
+     */
     public static final int TYPE_WIDGET_INVALIDE      = -1;
     public static final int TYPE_WIDGET_2X            = 0;
     public static final int TYPE_WIDGET_4X            = 1;

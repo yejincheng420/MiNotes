@@ -31,12 +31,17 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 
+/**
+ * 便签列表适配器
+ * 继承自CursorAdapter，负责将数据库中的便签数据渲染到ListView上
+ * 管理便签的多选状态、列表项的绑定和视图创建
+ */
 public class NotesListAdapter extends CursorAdapter {
     private static final String TAG = "NotesListAdapter";
-    private Context mContext;
-    private HashMap<Integer, Boolean> mSelectedIndex;
-    private int mNotesCount;
-    private boolean mChoiceMode;
+    private Context mContext;  // 上下文对象
+    private HashMap<Integer, Boolean> mSelectedIndex;  // 记录多选模式下选中的项
+    private int mNotesCount;  // 便签总数
+    private boolean mChoiceMode;  // 是否处于多选模式
 
     public static class AppWidgetAttribute {
         public int widgetId;
